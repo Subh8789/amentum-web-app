@@ -40,3 +40,8 @@ a {
     color-scheme: dark;
   }
 }
+
+.sticky-nav {
+  position: -webkit-sticky !important;
+  top: 0;
+}

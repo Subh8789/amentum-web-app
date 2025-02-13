@@ -1,0 +1,263 @@
+/* DHLUploadModal.module.css */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(229, 232, 237, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+  }
+  
+  .modalContainer {
+    background: white;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  .modalHeader {
+    background-color: #003C71;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .headerTitle {
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .headerSubtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    margin: 4px 0 0 0;
+  }
+  
+  .closeButton {
+    color: #003C71;
+    background: white;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+  }
+  
+  .closeButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .modalContent {
+    padding: 24px 24px 0;
+    max-height: calc(70vh - 140px);
+    overflow-y: auto;
+  }
+  
+  .modalContent::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .modalContent::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .modalContent::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+  
+  .modalContent::-webkit-scrollbar-thumb:hover {
+    background: #666;
+  }
+  
+  .formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 0;
+  }
+  
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .label {
+    color: #4A4A4A;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+  
+  .labelWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .selectWrapper {
+    position: relative;
+  }
+  
+  .select {
+    width: 100%;
+    padding: 10px 12px;
+    background-color: #F8FBFF;
+    border: 1px solid #E0E0E0;
+    color: #757575;
+    font-size: 14px;
+    appearance: none;
+    cursor: pointer;
+  }
+  
+  .selectArrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #757575;
+    pointer-events: none;
+  }
+  
+  .uploadArea {
+    border: 1px dashed #CCCCCC;
+    border-radius: 4px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    min-height: 42px;
+  }
+  
+  .uploadArea:hover {
+    background-color: #F8FBFF;
+  }
+  
+  .uploadIcon {
+    color: #1B3771;
+  }
+  
+  .uploadText {
+    color: #1B3771;
+    font-size: 14px;
+  }
+  
+  .documentFieldSet {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+  }
+  
+  .documentFieldSet:last-of-type {
+    margin-bottom: 16px;
+  }
+  
+  .deleteButton {
+    background: transparent;
+    border: none;
+    color: #FF5252;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .deleteButton:hover {
+    background-color: rgba(255, 82, 82, 0.1);
+  }
+  
+  .addDocumentBtn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #1B3771;
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    transition: opacity 0.2s;
+  }
+  
+  .addDocumentBtn:hover {
+    opacity: 0.8;
+  }
+  
+  .modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+  }
+  
+  .closeBtn {
+    padding: 8px 16px;
+    background-color: #FFFFFF;
+    border: 1px solid #DEE2E6;
+    color: #6C757D;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .closeBtn:hover {
+    background-color: #F8F9FA;
+    border-color: #C8CCD0;
+  }
+  
+  .saveButton {
+    padding: 8px 24px;
+    background-color: #8BC34A;
+    border: none;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    letter-spacing: 0.5px;
+  }
+  
+  .saveButton:hover {
+    background-color: #7CB342;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .formGrid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  
+    .modalContainer {
+      margin: 16px;
+    }
+  
+    .modalContent {
+      padding: 16px 16px 0;
+    }
+  
+    .modalFooter {
+      padding: 16px;
+    }
+  }

@@ -1,0 +1,8 @@
+.main-navbar{
+    position: sticky;
+    top: 0;
+    padding: 5px 30px;
+    /* background-color: #fff; */
+    backdrop-filter: blur(10px);
+    box-shadow: 0 7px 64px #00000012;
+}
