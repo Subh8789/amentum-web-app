@@ -63,6 +63,7 @@ import {
 
 const StatusIcon = ({ status }) => {
   const getStatusImage = () => {
+    
     const statusLower = status.toLowerCase();
     if (statusLower.includes('ois')) {
       return {
