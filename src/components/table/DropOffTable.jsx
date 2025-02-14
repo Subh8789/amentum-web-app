@@ -23,23 +23,75 @@ import {
   Download,
 } from "lucide-react";
 
+// const StatusIcon = ({ status }) => {
+//   const getStatusStyle = () => {
+//     switch (status) {
+//       case "dhl":
+//         return { backgroundColor: "#FFD700" };
+//       case "flag":
+//         return { backgroundColor: "#28a745" };
+//       case "globe":
+//         return { backgroundColor: "#007bff" };
+//       default:
+//         return { backgroundColor: "#FFD700" };
+//     }
+//   };
+
+//   return (
+//     <span
+//       className="badge d-flex align-items-center gap-1"
+//       style={{
+//         backgroundColor: "#f8f9fa",
+//         color: "#333",
+//         padding: "6px 12px",
+//         borderRadius: "20px",
+//       }}
+//     >
+//       <span
+//         style={{
+//           ...getStatusStyle(),
+//           display: "inline-block",
+//           width: "8px",
+//           height: "8px",
+//           borderRadius: "50%",
+//         }}
+//       ></span>
+//       {status}
+//     </span>
+//   );
+// };
+
 const StatusIcon = ({ status }) => {
-  const getStatusStyle = () => {
-    switch (status) {
-      case "dhl":
-        return { backgroundColor: "#FFD700" };
-      case "flag":
-        return { backgroundColor: "#28a745" };
-      case "globe":
-        return { backgroundColor: "#007bff" };
-      default:
-        return { backgroundColor: "#FFD700" };
+  const getStatusImage = () => {
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes('ois')) {
+      return {
+        src: '/logo.svg',  // Replace with actual OIS flag image path
+        alt: 'OIS Status'
+      };
+    } else if (statusLower.includes('dhl')) {
+      return {
+        src: '/images/dhl-logo.png',  // Replace with actual DHL logo path
+        alt: 'DHL Status'
+      };
+    } else if (statusLower.includes('embassy')) {
+      return {
+        src: '/embassy.png',  // Replace with actual embassy icon path
+        alt: 'Embassy Status'
+      };
+    } else {
+      return {
+        src: '/images/default-icon.png',  // Replace with default icon path
+        alt: 'Status Icon'
+      };
     }
   };
 
+  const imageInfo = getStatusImage();
+
   return (
     <span
-      className="badge d-flex align-items-center gap-1"
+      className="badge d-flex align-items-center gap-2"
       style={{
         backgroundColor: "#f8f9fa",
         color: "#333",
@@ -47,19 +99,20 @@ const StatusIcon = ({ status }) => {
         borderRadius: "20px",
       }}
     >
-      <span
+      <img 
+        src={imageInfo.src}
+        alt={imageInfo.alt}
         style={{
-          ...getStatusStyle(),
-          display: "inline-block",
-          width: "8px",
-          height: "8px",
-          borderRadius: "50%",
+          width: "16px",
+          height: "16px",
+          objectFit: "contain"
         }}
-      ></span>
-      {status}
+      />
+      <span>{status}</span>
     </span>
   );
 };
+
 
 const DropOffTable = ({ dropoffData, loading, error }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,23 +129,27 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
     return dropoffData.slice(indexOfFirstRecord, indexOfLastRecord);
   }, [currentPage, dropoffData]);
 
-  // Check if any selected row has status "Dropped-Off Sent To Embassy"
-  const isAnySelectedRowSentToEmbassy = useMemo(() => {
-    return selectedRows.some(id => {
-      const record = dropoffData.find(row => row.id === id);
-      return record && record.status === "Dropped-Off Sent To Embassy";
-    });
-  }, [selectedRows, dropoffData]);
+  // Get selectable records (excluding sent to embassy)
+  const selectableRecords = useMemo(() => {
+    return currentRecords.filter(
+      record => record.status !== "Dropped-Off Sent To Embassy"
+    );
+  }, [currentRecords]);
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
-      setSelectedRows(currentRecords.map((row) => row.id));
+      // Only select rows that are not sent to embassy
+      const selectableIds = selectableRecords.map(row => row.id);
+      setSelectedRows(selectableIds);
     } else {
       setSelectedRows([]);
     }
   };
 
-  const handleRowSelect = (id) => {
+  const handleRowSelect = (id, status) => {
+    if (status === "Dropped-Off Sent To Embassy") {
+      return; // Do nothing if status is sent to embassy
+    }
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
     );
@@ -105,11 +162,6 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
   const sendToEmbassy = async () => {
     if (selectedRows.length === 0) {
       alert("Please select at least one application.");
-      return;
-    }
-
-    if (isAnySelectedRowSentToEmbassy) {
-      alert("Cannot send applications that are already sent to embassy.");
       return;
     }
 
@@ -129,7 +181,8 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
       if (result.responseCode === 200 && result.success) {
         alert("Applications sent to embassy successfully.");
         setSelectedRows([]);
-        router.push("/dropoff")
+        router.refresh();
+        window.location.reload();
       } else {
         alert("Failed to update applications.");
       }
@@ -152,31 +205,25 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
         </h2>
         <div className="d-flex gap-2">
          <Dropdown align="end">
-                    <Dropdown.Toggle
-                      variant="light"
-                      className="d-flex align-items-center gap-2 mt-2"
-                      style={{ padding: "8px 12px" }}
-                    >
-                      Report
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu className='drop-menu'>
-                    <Dropdown.Item
-                        className="fw-semibold text-primary"               
-                      >
-                        DROPOFF/ COLLECTION REPORT
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        className="fw-semibold text-primary"               
-                      >
-                       OFFICER REPORT OIS
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        className="fw-semibold text-primary"               
-                      >
-                       OFFICER REPORT DHL
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
+            <Dropdown.Toggle
+              variant="light"
+              className="d-flex align-items-center gap-2 mt-2"
+              style={{ padding: "8px 12px" }}
+            >
+              Report
+            </Dropdown.Toggle>
+            <Dropdown.Menu className='drop-menu'>
+              <Dropdown.Item className="fw-semibold text-primary">
+                DROPOFF/ COLLECTION REPORT
+              </Dropdown.Item>
+              <Dropdown.Item className="fw-semibold text-primary">
+                OFFICER REPORT OIS
+              </Dropdown.Item>
+              <Dropdown.Item className="fw-semibold text-primary">
+                OFFICER REPORT DHL
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
         <div className="d-flex gap-2">
           <Dropdown align="end">
@@ -190,10 +237,8 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
             </Dropdown.Toggle>
             <Dropdown.Menu className='drop-menu'>
               <Dropdown.Item
-                className={`fw-semibold ${isAnySelectedRowSentToEmbassy ? 'text-muted' : 'text-primary'}`}
+                className="fw-semibold text-primary"
                 onClick={sendToEmbassy}
-                disabled={isAnySelectedRowSentToEmbassy}
-                style={{ opacity: isAnySelectedRowSentToEmbassy ? '0.6' : '1' }}
               >
                 SEND TO EMBASSY
               </Dropdown.Item>
@@ -218,7 +263,8 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
                 <Form.Check
                   type="checkbox"
                   onChange={handleSelectAll}
-                  checked={selectedRows.length === currentRecords.length}
+                  checked={selectedRows.length === selectableRecords.length && selectableRecords.length > 0}
+                  disabled={selectableRecords.length === 0}
                 />
               </th>
               <th className="border-0 py-3">Passport #</th>
@@ -234,64 +280,77 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((row, index) => (
-              <tr
-                key={index}
-                className={`${selectedRows.includes(row.id) ? "bg-light" : ""}`}
-                style={{
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                  backgroundColor: index === 2 ? "#f0f9ff" : "white",
-                }}
-              >
-                <td className="py-3">
-                  <Form.Check
-                    type="checkbox"
-                    checked={selectedRows.includes(row.id)}
-                    onChange={() => handleRowSelect(row.id)}
-                  />
-                </td>
-                <td>
-                  <Link href={`/applicationdetails?trackingCode=${row.passportNumber}`} className="text-primary text-decoration-none">{row.passportNumber}</Link>
-                </td>
-                <td>{row.center}</td>
-                <td>{row.visaType}</td>
-                <td>{row.surname}</td>
-                <td>{row.firstName}</td>
-                <td>{row.phoneNumber}</td>
-                <td>{row.collectionDate}</td>
-                <td>{row.officer}</td>
-                <td>
-                  <StatusIcon status={row.status} />
-                </td>
-                <td>
-                  <Dropdown align="end">
-                    <Dropdown.Toggle
-                      variant="light"
-                      size="sm"
-                      className="border-0"
+            {currentRecords.map((row, index) => {
+              const isSentToEmbassy = row.status === "Dropped-Off Sent To Embassy";
+              return (
+                <tr
+                  key={index}
+                  className={`${selectedRows.includes(row.id) ? "bg-light" : ""} ${
+                    isSentToEmbassy ? "disabled-row" : ""
+                  }`}
+                  style={{
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    backgroundColor: isSentToEmbassy ? "#f5f5f5" : index === 2 ? "#f0f9ff" : "white",
+                    opacity: isSentToEmbassy ? 0.7 : 1,
+                    cursor: isSentToEmbassy ? "not-allowed" : "pointer"
+                  }}
+                >
+                  <td className="py-3">
+                    <Form.Check
+                      type="checkbox"
+                      checked={selectedRows.includes(row.id)}
+                      onChange={() => handleRowSelect(row.id, row.status)}
+                      disabled={isSentToEmbassy}
+                    />
+                  </td>
+                  <td>
+                    <Link 
+                      href={`/applicationdetails?trackingCode=${row.passportNumber}`} 
+                      className={`text-decoration-none ${isSentToEmbassy ? 'text-muted' : 'text-primary'}`}
                     >
-                      <MoreVertical size={16} />
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu className='drop-menu'>
-                      <Dropdown.Item
-                        className="fw-semibold text-primary"
-                        onClick={() => handleDetails(row.passportNumber)}
+                      {row.passportNumber}
+                    </Link>
+                  </td>
+                  <td>{row.center}</td>
+                  <td>{row.visaType}</td>
+                  <td>{row.surname}</td>
+                  <td>{row.firstName}</td>
+                  <td>{row.phoneNumber}</td>
+                  <td>{row.collectionDate}</td>
+                  <td>{row.officer}</td>
+                  <td>
+                    <StatusIcon status={row.status} />
+                  </td>
+                  <td>
+                    <Dropdown align="end">
+                      <Dropdown.Toggle
+                        variant="light"
+                        size="sm"
+                        className="border-0"
+                        disabled={isSentToEmbassy}
                       >
-                        VIEW DETAILS
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        className={`fw-semibold ${row.status === "Dropped-Off Sent To Embassy" ? 'text-muted' : 'text-primary'}`}
-                        onClick={sendToEmbassy}
-                        disabled={row.status === "Dropped-Off Sent To Embassy"}
-                        style={{ opacity: row.status === "Dropped-Off Sent To Embassy" ? '0.6' : '1' }}
-                      >
-                        SEND TO EMBASSY
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </td>
-              </tr>
-            ))}
+                        <MoreVertical size={16} />
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu className='drop-menu'>
+                        <Dropdown.Item
+                          className="fw-semibold text-primary"
+                          onClick={() => handleDetails(row.passportNumber)}
+                        >
+                          VIEW DETAILS
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          className="fw-semibold text-primary"
+                          onClick={sendToEmbassy}
+                          disabled={isSentToEmbassy}
+                        >
+                          SEND TO EMBASSY
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       </div>
@@ -375,6 +434,12 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
           background-color: #28a745;
           border-color: #28a745;
           z-index:0;
+        }
+        .disabled-row {
+          pointer-events: none;
+        }
+        .disabled-row a {
+          pointer-events: auto;
         }
       `}</style>
     </Container>

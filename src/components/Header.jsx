@@ -23,7 +23,7 @@ const Header = () => {
                {!hideProfile.includes(pathname) && <>
                     <img src='./profile.png' alt='User Profile' className='profile-pic' />
                     <div className='user-info'>
-                        <span>Hello Jinna</span>
+                        <span>Hello User</span>
                         <a href='#' className='logout'>Log Out ▼</a>
                     </div>
                     </>}

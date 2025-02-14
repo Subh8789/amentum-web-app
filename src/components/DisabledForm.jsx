@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Nav, Table } from "react-bootstrap";
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 
 
@@ -47,7 +48,7 @@ const DisabledForm = ({ formData, loading, error }) => {
         </div>
     );
 
-
+  const router = useRouter();
 
 
     return (
@@ -66,7 +67,7 @@ const DisabledForm = ({ formData, loading, error }) => {
 
                         <div className="me-4">
                             <span className="text-muted me-2">Status:</span>
-                           {formData && <span style={{ color: "#004B87", fontWeight: "500" }}>
+                            {formData && <span style={{ color: "#004B87", fontWeight: "500" }}>
                                 {formData.status}
                             </span>}
                         </div>
@@ -80,6 +81,7 @@ const DisabledForm = ({ formData, loading, error }) => {
                                 <span
                                     className="ms-1"
                                     style={{ fontSize: "14px", fontWeight: "500" }}
+                                    onClick={()=>router.push("/dropoff")}
                                 >
                                     BACK
                                 </span>
@@ -166,24 +168,26 @@ const DisabledForm = ({ formData, loading, error }) => {
 
                                 {/* Event List */}
                                 <div className="p-4">
-                                  <Table hover className="align-middle mb-0">
-                                                                      <tbody>
-                                                                          <tr
-                                                                              style={{
-                                                                                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                                                                                  backgroundColor: "white",
-                                                                              }}
-                                                                          >
-                                                                              <td className="py-3">
-                                                                                  <span style={{ color: "#0d6efd" }}>{formData.status}</span>
-                                                                              </td>
-                                                                              <td className="py-3 text-muted">
-                                                                                  {formData.officer}
-                                                                              </td>
-                                                                              <td className="py-3 text-muted">{formData.log}</td>
-                                                                          </tr>
-                                                                      </tbody>
-                                                                  </Table>
+                                    <Table hover className="align-middle mb-0">
+                                        <tbody>
+                                            <tr
+                                                style={{
+                                                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                                                    backgroundColor: "white",
+                                                }}
+                                            >
+
+
+                                                <td className="py-3 ">
+                                                    <span style={{ color: "#0d6efd" }}>{formData?.logs[0]?.status}</span>
+                                                </td>
+                                                <td className="py-3 text-muted">
+                                                    {formData?.logs[0]?.user}
+                                                </td>
+                                                <td className="py-3 text-muted"> {formData?.logs[0]?.date}</td>
+                                            </tr>
+                                        </tbody>
+                                    </Table>
 
                                     <div className="mt-5">
                                         <div style={{ color: "#ff6b00", fontWeight: "500" }}>
