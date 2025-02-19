@@ -27,11 +27,11 @@ const LoginPage = () => {
       {/* Login Form Card */}
       <div className="login-form-card">
         {/* Logo */}
-        <div className="logo-container">
+        {/* <div className="logo-container">
           <div className="logo">
             <span className="logo-text">S</span>
           </div>
-        </div>
+        </div> */}
 
         <h2 className="form-title">
           Amentum Ois Web Solution

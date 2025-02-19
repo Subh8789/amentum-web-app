@@ -214,7 +214,7 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
               Report
             </Dropdown.Toggle>
             <Dropdown.Menu className='drop-menu'>
-              <Dropdown.Item className="fw-semibold text-primary">
+              <Dropdown.Item className="fw-semibold text-primary" onClick={()=>router.push("/dropoff-report")}>
                 DROPOFF/ COLLECTION REPORT
               </Dropdown.Item>
               <Dropdown.Item className="fw-semibold text-primary">
@@ -359,8 +359,8 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
       {/* Footer */}
       <div className="d-flex justify-content-between align-items-center mt-4">
         <Button variant="light" className="d-flex align-items-center gap-2">
-          <Download size={16} className="text-success" />
-          <span className="text-success">Export/Download</span>
+          {/* <Download size={16} className="text-success" />
+          <span className="text-success">Export/Download</span> */}
         </Button>
 
         <Pagination>

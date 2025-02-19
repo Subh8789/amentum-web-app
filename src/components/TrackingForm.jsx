@@ -197,8 +197,7 @@ const TrackingForm = ({ formData}) => {
         </div>
     );
     function handleOnClose(){
-        setError(null);
-        router.push("/dropoff");
+        setError(null); 
     }
     return (
 
@@ -217,9 +216,9 @@ const TrackingForm = ({ formData}) => {
               <Container fluid style={{ padding: "0 40px" }}>
                   <div className="d-flex justify-content-between align-items-center py-3">
                       <div>
-                          <span style={{ color: "#ff6b00", fontWeight: "500" }}>
-                              Drop-OFF
-                          </span>
+                      <span style={{ color: "#ff6b00", fontWeight: "500" }}>
+                                DROP-OFF
+                            </span>
                           {/* {/* <span className="text-dark mx-2">
                               1234576980 | Dahhaoui Taoufik |
                           </span> 

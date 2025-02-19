@@ -1,12 +1,11 @@
 "use client";
-
-import { useState,useEffect } from 'react';
 import React from 'react'
-import PickupTable from '@/components/table/PickupTable';
+import { useState,useEffect } from 'react';
+import OfficerReportDhl from '@/components/report/OfficerReportDhl';
 
-const Pickup = () => {
+function OfficerReportPage() {
 
-   const [dropoffData,setDropoffData] = useState([])
+ const [dropoffData,setDropoffData] = useState([])
    const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
@@ -33,7 +32,7 @@ const Pickup = () => {
           };
     
           try {
-            const response = await fetch(`${GET_APPOINTMENT_DROP}?type=pick`, requestOptions);
+            const response = await fetch(`${GET_APPOINTMENT_DROP}?type=drop`, requestOptions);
             const data = await response.json();
             if (data.responseCode === 200 && data.success) {
               setDropoffData(data?.data?.data);
@@ -54,11 +53,9 @@ const Pickup = () => {
 
   return (
    <>
-    <PickupTable dropoffData={dropoffData} loading={loading} error={error} />
-   </>
+      <OfficerReportDhl dropoffData={dropoffData} loading={loading} error={error} />
+    </>
   )
 }
 
-export default Pickup;
-
-
+export default OfficerReportPage
