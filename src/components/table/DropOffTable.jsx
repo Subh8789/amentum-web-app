@@ -23,43 +23,6 @@ import {
   Download,
 } from "lucide-react";
 
-// const StatusIcon = ({ status }) => {
-//   const getStatusStyle = () => {
-//     switch (status) {
-//       case "dhl":
-//         return { backgroundColor: "#FFD700" };
-//       case "flag":
-//         return { backgroundColor: "#28a745" };
-//       case "globe":
-//         return { backgroundColor: "#007bff" };
-//       default:
-//         return { backgroundColor: "#FFD700" };
-//     }
-//   };
-
-//   return (
-//     <span
-//       className="badge d-flex align-items-center gap-1"
-//       style={{
-//         backgroundColor: "#f8f9fa",
-//         color: "#333",
-//         padding: "6px 12px",
-//         borderRadius: "20px",
-//       }}
-//     >
-//       <span
-//         style={{
-//           ...getStatusStyle(),
-//           display: "inline-block",
-//           width: "8px",
-//           height: "8px",
-//           borderRadius: "50%",
-//         }}
-//       ></span>
-//       {status}
-//     </span>
-//   );
-// };
 
 const StatusIcon = ({ status }) => {
   const getStatusImage = () => {

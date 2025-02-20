@@ -19,7 +19,7 @@ const OfficerReportOis = ({ dropoffData = [], loading, error }) => {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [filteredData, setFilteredData] = useState([]);
-    const [selectedUser, setSelectedUser] = useState("All");
+    const [selectedUser, setSelectedUser] = useState("");
 
     const router = useRouter();
 
@@ -147,7 +147,7 @@ const OfficerReportOis = ({ dropoffData = [], loading, error }) => {
             value={selectedUser}
             onChange={(e) => setSelectedUser(e.target.value)}
           >
-            <option value="All">All</option>
+            <option value="">All</option>
             <option value="JohnDoe">John Doe</option>
             <option value="JaneSmith">Jane Smith</option>
             <option value="MikeJohnson">Mike Johnson</option>

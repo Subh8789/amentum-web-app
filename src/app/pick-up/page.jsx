@@ -6,7 +6,7 @@ import PickupTable from '@/components/table/PickupTable';
 
 const Pickup = () => {
 
-   const [dropoffData,setDropoffData] = useState([])
+   const [pickupData,setPickupData] = useState([])
    const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
@@ -18,7 +18,7 @@ const Pickup = () => {
     useEffect(() => {
 
        console.log("under dropoff page")
-        const fetchDropOffData = async () => {
+        const fetchpickupData = async () => {
           setLoading(true);
           setError(null);
     
@@ -36,7 +36,7 @@ const Pickup = () => {
             const response = await fetch(`${GET_APPOINTMENT_DROP}?type=pick`, requestOptions);
             const data = await response.json();
             if (data.responseCode === 200 && data.success) {
-              setDropoffData(data?.data?.data);
+              setPickupData(data?.data?.data);
             } else {
               setError("No data found ");
             }
@@ -48,13 +48,13 @@ const Pickup = () => {
           }
         };
     
-        fetchDropOffData();
+        fetchpickupData();
       }, []);
   
 
   return (
    <>
-    <PickupTable dropoffData={dropoffData} loading={loading} error={error} />
+    <PickupTable pickupData={pickupData} loading={loading} error={error} />
    </>
   )
 }

@@ -12,6 +12,8 @@ import {
     Pagination,
     Dropdown,
     InputGroup,
+    Modal, // Added Modal component
+
 } from "react-bootstrap";
 import {
     ChevronFirst,
@@ -77,25 +79,31 @@ const StatusIcon = ({ status }) => {
 };
 
 
-const PickupTable = ({ dropoffData, loading, error }) => {
+const PickupTable = ({ pickupData, loading, error }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedRows, setSelectedRows] = useState([]);
     const router = useRouter();
 
+    // Add states for modal
+    const [showModal, setShowModal] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState("");
+    const [currentStatus, setCurrentStatus] = useState("");
+
+
     const recordsPerPage = 10;
-    const totalPages = Math.ceil(dropoffData.length / recordsPerPage);
+    const totalPages = Math.ceil(pickupData.length / recordsPerPage);
 
     // Get current records
     const currentRecords = useMemo(() => {
         const indexOfLastRecord = currentPage * recordsPerPage;
         const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-        return dropoffData.slice(indexOfFirstRecord, indexOfLastRecord);
-    }, [currentPage, dropoffData]);
+        return pickupData.slice(indexOfFirstRecord, indexOfLastRecord);
+    }, [currentPage, pickupData]);
 
     // Get selectable records (excluding sent to embassy)
     const selectableRecords = useMemo(() => {
         return currentRecords.filter(
-            record => record.status !== "Dropped-Off Sent To Embassy"
+            record => record.status !== "Picked-up (Delivered)"
         );
     }, [currentRecords]);
 
@@ -110,7 +118,7 @@ const PickupTable = ({ dropoffData, loading, error }) => {
     };
 
     const handleRowSelect = (id, status) => {
-        if (status === "Dropped-Off Sent To Embassy") {
+        if (status === "Picked-up (Delivered)") {
             return; // Do nothing if status is sent to embassy
         }
         setSelectedRows((prev) =>
@@ -122,12 +130,55 @@ const PickupTable = ({ dropoffData, loading, error }) => {
     const POST_KEY = "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253"
     const UPDATE_API_URL = `${BASE_URL}/api/v1/waybill/track/appointments/update`;
 
-    const sendToEmbassy = async () => {
+
+    const handleStatusUpdate = (statusMsg) => {
         if (selectedRows.length === 0) {
             alert("Please select at least one application.");
             return;
         }
+        // Find current status of first selected row
+        const firstSelectedRow = pickupData.find(row => row.id === selectedRows[0]);
+        setCurrentStatus(firstSelectedRow?.status || "Unknown");
+        setSelectedStatus(statusMsg);
+        setShowModal(true);
+    };
 
+
+
+    // const statusUpdate = async (statusMsg) => {
+    //     if (selectedRows.length === 0) {
+    //         alert("Please select at least one application.");
+    //         return;
+    //     }
+
+    //     try {
+    //         const response = await fetch(UPDATE_API_URL, {
+    //             method: "PATCH",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 "post-key": POST_KEY
+    //             },
+    //             body: JSON.stringify({
+    //                 applications: selectedRows,
+    //                 status: statusMsg
+    //             })
+    //         });
+    //         const result = await response.json();
+    //         if (result.responseCode === 200 && result.success) {
+    //             alert(`Applications status has been updated to ${statusMsg}`);
+    //             setSelectedRows([]);
+    //             router.refresh();
+    //             window.location.reload();
+    //         } else {
+    //             alert("Failed to update applications.");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error updating applications:", error);
+    //         alert("An error occurred while updating applications.");
+    //     }
+    // };
+
+    const confirmStatusUpdate = async () => {
         try {
             const response = await fetch(UPDATE_API_URL, {
                 method: "PATCH",
@@ -137,12 +188,12 @@ const PickupTable = ({ dropoffData, loading, error }) => {
                 },
                 body: JSON.stringify({
                     applications: selectedRows,
-                    status: "Dropped-Off Sent To Embassy"
+                    status: selectedStatus
                 })
             });
             const result = await response.json();
             if (result.responseCode === 200 && result.success) {
-                alert("Applications sent to embassy successfully.");
+                alert(`Applications status has been updated to ${selectedStatus}`);
                 setSelectedRows([]);
                 router.refresh();
                 window.location.reload();
@@ -153,7 +204,9 @@ const PickupTable = ({ dropoffData, loading, error }) => {
             console.error("Error updating applications:", error);
             alert("An error occurred while updating applications.");
         }
+        setShowModal(false);
     };
+
 
     const handleDetails = (passportNo) => {
         router.push(`/applicationdetails?trackingCode=${passportNo}`);
@@ -196,6 +249,26 @@ const PickupTable = ({ dropoffData, loading, error }) => {
 
                     </Dropdown>
                 </div>
+
+                {/* Add Modal component */}
+                <Modal show={showModal} onHide={() => setShowModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Confirm Status Change</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        Are you sure you want to change the status from "{currentStatus}" to "{selectedStatus}"?
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="primary" onClick={confirmStatusUpdate}>
+                            Confirm
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+
                 <div className="d-flex gap-2">
                     <Dropdown align="end">
                         <Dropdown.Toggle
@@ -207,29 +280,20 @@ const PickupTable = ({ dropoffData, loading, error }) => {
                             <MoreVertical size={16} />
                         </Dropdown.Toggle>
                         <Dropdown.Menu className='drop-menu'>
-                            {/* <Dropdown.Item className="fw-semibold text-primary" onClick={sendToEmbassy}>
-                                SEND TO EMBASSY
-                            </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/dhlUpload")}>
-                                DHL REPORTS
-                            </Dropdown.Item> */}
-                            <Dropdown.Item className="fw-semibold text-primary">
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => handleStatusUpdate("Received from Embassy")}>
                                 RECEIVED FROM EMBASSY
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary">
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => handleStatusUpdate("Passport Not Received")}>
                                 PASSPORT NOT RECEIVED
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary">
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => handleStatusUpdate("Ready for Pick-Up")}>
                                 READY FOR PICK-UP
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary">
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => handleStatusUpdate("Delivered To DHL")}>
                                 DELIVERED TO DHL
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary">
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => handleStatusUpdate("Returned to Embassy on Request")}>
                                 RETURN TO EMBASSY
-                            </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary">
-                                MANAGE PICK-UP/COLLECTION
                             </Dropdown.Item>
                         </Dropdown.Menu>
 
@@ -267,7 +331,7 @@ const PickupTable = ({ dropoffData, loading, error }) => {
 
                     <tbody>
                         {currentRecords.map((row, index) => {
-                            const isSentToEmbassy = row.status === "Dropped-Off Sent To Embassy";
+                            const isSentToEmbassy = row.status === "Picked-up (Delivered)";
                             return (
                                 <tr
                                     key={index}
@@ -326,24 +390,24 @@ const PickupTable = ({ dropoffData, loading, error }) => {
                                                 >
                                                     VIEW DETAILS
                                                 </Dropdown.Item>
-                                                <Dropdown.Item className="fw-semibold text-primary">
+                                                <Dropdown.Item className="fw-semibold text-primary" onClick={() => handleStatusUpdate("Received from Embassy")}>
                                                     RECEIVED FROM EMBASSY
                                                 </Dropdown.Item>
-                                                <Dropdown.Item className="fw-semibold text-primary">
+                                                <Dropdown.Item className="fw-semibold text-primary" onClick={() => handleStatusUpdate("Passport Not Received")}>
                                                     PASSPORT NOT RECEIVED
                                                 </Dropdown.Item>
-                                                <Dropdown.Item className="fw-semibold text-primary">
+                                                <Dropdown.Item className="fw-semibold text-primary" onClick={() => handleStatusUpdate("Ready for Pick-Up")}>
                                                     READY FOR PICK-UP
                                                 </Dropdown.Item>
-                                                <Dropdown.Item className="fw-semibold text-primary">
+                                                <Dropdown.Item className="fw-semibold text-primary" onClick={() => handleStatusUpdate("Delivered To DHL")}>
                                                     DELIVERED TO DHL
                                                 </Dropdown.Item>
-                                                <Dropdown.Item className="fw-semibold text-primary">
+                                                <Dropdown.Item className="fw-semibold text-primary" onClick={() => handleStatusUpdate("Returned to Embassy on Request")}>
                                                     RETURN TO EMBASSY
                                                 </Dropdown.Item>
-                                                <Dropdown.Item className="fw-semibold text-primary">
+                                                {/* <Dropdown.Item className="fw-semibold text-primary">
                                                     MANAGE PICK-UP/COLLECTION
-                                                </Dropdown.Item>
+                                                </Dropdown.Item> */}
                                             </Dropdown.Menu>
                                         </Dropdown>
                                     </td>
@@ -397,6 +461,9 @@ const PickupTable = ({ dropoffData, loading, error }) => {
             </div>
 
             <style jsx global>{`
+            .table-responsive{
+           overflow-x: unset;
+            }
         .drop-menu{
           background: #003C71;
           margin-left: 50px;

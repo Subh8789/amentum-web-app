@@ -4,6 +4,7 @@ import TrackingForm from '@/components/TrackingForm';
 import React from 'react';
 import "./applicationDetails.css"
 import { useRouter } from 'next/navigation';
+import DisabledFormPickup from '@/components/forms/DisabledFormPickup';
 
 import { useState,useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -88,12 +89,22 @@ function page() {
     {loading && <LoadingModal />}
       {error && <ErrorModal message={error} onClose={() => handleOnClose()} />}
       
-    {
+    {/* {
         formData && formData.status == "Appointment booked" ?
         <TrackingForm formData={formData} />
         :
         <DisabledForm formData={formData}/>
-    }
+    } */}
+
+{formData && formData.status 
+        ? formData.status.includes("Appointment booked") 
+          ? <TrackingForm formData={formData} />
+          : formData.status.includes("Dropped") 
+            ? <DisabledForm formData={formData} />
+            : <DisabledFormPickup formData={formData} />
+        : <DisabledFormPickup formData={formData} />
+      }
+
     </>
   )
 }
