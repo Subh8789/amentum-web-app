@@ -7,26 +7,18 @@ import {
   Form,
   Button,
   Container,
-  Nav,
-  Navbar,
   Pagination,
   Dropdown,
-  InputGroup,
+  Modal, // Added Modal import
 } from "react-bootstrap";
 import {
-  ChevronFirst,
-  ChevronLast,
-  ChevronLeft,
-  ChevronRight,
   MoreVertical,
-  Search,
-  Download,
 } from "lucide-react";
 
 
 const StatusIcon = ({ status }) => {
   const getStatusImage = () => {
-    
+
     const statusLower = status.toLowerCase();
     if (statusLower.includes('ois')) {
       return {
@@ -63,7 +55,7 @@ const StatusIcon = ({ status }) => {
         borderRadius: "20px",
       }}
     >
-      <img 
+      <img
         src={imageInfo.src}
         alt={imageInfo.alt}
         style={{
@@ -82,6 +74,15 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState([]);
   const router = useRouter();
+
+  // Add state for modal
+  const [showModal, setShowModal] = useState(false);
+  const [modalInfo, setModalInfo] = useState({
+    currentStatus: '',
+    newStatus: '',
+    identifiers: [],
+    type: '' // 'single' or 'multiple'
+  });
 
   const recordsPerPage = 10;
   const totalPages = Math.ceil(dropoffData.length / recordsPerPage);
@@ -123,12 +124,19 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
   const POST_KEY = "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253"
   const UPDATE_API_URL = `${BASE_URL}/api/v1/waybill/track/appointments/update`;
 
-  const sendToEmbassy = async () => {
-    if (selectedRows.length === 0) {
-      alert("Please select at least one application.");
-      return;
-    }
 
+  const handleStatusChange = (applications, newStatus, currentStatus, type = 'multiple') => {
+    setModalInfo({
+      currentStatus,
+      newStatus,
+      identifiers: applications,
+      type
+    });
+    setShowModal(true);
+  };
+
+  const confirmStatusChange = async () => {
+    setShowModal(false);
     try {
       const response = await fetch(UPDATE_API_URL, {
         method: "PATCH",
@@ -137,24 +145,78 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
           "post-key": POST_KEY
         },
         body: JSON.stringify({
-          applications: selectedRows,
-          status: "Dropped-Off Sent To Embassy"
+          applications: modalInfo.identifiers,
+          status: modalInfo.newStatus
         })
       });
       const result = await response.json();
       if (result.responseCode === 200 && result.success) {
-        alert("Applications sent to embassy successfully.");
+        alert("Status updated successfully.");
         setSelectedRows([]);
         router.refresh();
         window.location.reload();
       } else {
-        alert("Failed to update applications.");
+        alert("Failed to update status.");
       }
     } catch (error) {
-      console.error("Error updating applications:", error);
-      alert("An error occurred while updating applications.");
+      console.error("Error updating status:", error);
+      alert("An error occurred while updating status.");
     }
   };
+
+  const sendToEmbassy = () => {
+    if (selectedRows.length === 0) {
+      alert("Please select at least one application.");
+      return;
+    }
+
+    const selectedApplications = currentRecords
+      .filter(record => selectedRows.includes(record.id))
+      .map(record => ({
+        id: record.id,
+        identifier: record.passportNumber || record.trackingId
+      }));
+
+    handleStatusChange(
+      selectedRows,
+      "Dropped-Off Sent To Embassy",
+      selectedApplications[0].currentStatus,
+      'multiple'
+    );
+  };
+
+  // const sendToEmbassy = async () => {
+  //   if (selectedRows.length === 0) {
+  //     alert("Please select at least one application.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await fetch(UPDATE_API_URL, {
+  //       method: "PATCH",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "post-key": POST_KEY
+  //       },
+  //       body: JSON.stringify({
+  //         applications: selectedRows,
+  //         status: "Dropped-Off Sent To Embassy"
+  //       })
+  //     });
+  //     const result = await response.json();
+  //     if (result.responseCode === 200 && result.success) {
+  //       alert("Applications sent to embassy successfully.");
+  //       setSelectedRows([]);
+  //       router.refresh();
+  //       window.location.reload();
+  //     } else {
+  //       alert("Failed to update applications.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating applications:", error);
+  //     alert("An error occurred while updating applications.");
+  //   }
+  // };
 
   const handleDetails = (passportNo) => {
     router.push(`/applicationdetails?trackingCode=${passportNo}`);
@@ -168,7 +230,7 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
           Drop-Off
         </h2>
         <div className="d-flex gap-2">
-         <Dropdown align="end">
+          <Dropdown align="end">
             <Dropdown.Toggle
               variant="light"
               className="d-flex align-items-center gap-2 mt-2"
@@ -177,7 +239,7 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
               Report
             </Dropdown.Toggle>
             <Dropdown.Menu className='drop-menu'>
-              <Dropdown.Item className="fw-semibold text-primary" onClick={()=>router.push("/dropoff-report")}>
+              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/dropoff-report")}>
                 DROPOFF/ COLLECTION REPORT
               </Dropdown.Item>
               <Dropdown.Item className="fw-semibold text-primary">
@@ -189,6 +251,36 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
             </Dropdown.Menu>
           </Dropdown>
         </div>
+
+        {/* Add Modal */}
+        <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Status Change</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {modalInfo.type === 'multiple' ? (
+              <p>
+                Are you sure you want to change the status of {modalInfo.identifiers.length} selected
+                application(s) "{modalInfo.currentStatus}" to "{modalInfo.newStatus}"?
+              </p>
+            ) : (
+              <p>
+                Are you sure you want to change the status of application
+                from "{modalInfo.currentStatus}" to "{modalInfo.newStatus}"?
+              </p>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={confirmStatusChange}>
+              Confirm
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+
         <div className="d-flex gap-2">
           <Dropdown align="end">
             <Dropdown.Toggle
@@ -208,7 +300,7 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
               </Dropdown.Item>
               <Dropdown.Item
                 className="fw-semibold text-primary"
-                onClick={()=>router.push("/dhlUpload")}
+                onClick={() => router.push("/dhlUpload")}
               >
                 DHL REPORTS
               </Dropdown.Item>
@@ -249,9 +341,8 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
               return (
                 <tr
                   key={index}
-                  className={`${selectedRows.includes(row.id) ? "bg-light" : ""} ${
-                    isSentToEmbassy ? "disabled-row" : ""
-                  }`}
+                  className={`${selectedRows.includes(row.id) ? "bg-light" : ""} ${isSentToEmbassy ? "disabled-row" : ""
+                    }`}
                   style={{
                     boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                     backgroundColor: isSentToEmbassy ? "#f5f5f5" : index === 2 ? "#f0f9ff" : "white",
@@ -268,8 +359,8 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
                     />
                   </td>
                   <td>
-                    <Link 
-                      href={`/applicationdetails?trackingCode=${row.passportNumber}`} 
+                    <Link
+                      href={`/applicationdetails?trackingCode=${row.passportNumber}`}
                       className={`text-decoration-none ${isSentToEmbassy ? 'text-muted' : 'text-primary'}`}
                     >
                       {row.passportNumber}
@@ -304,7 +395,12 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
                         </Dropdown.Item>
                         <Dropdown.Item
                           className="fw-semibold text-primary"
-                          onClick={sendToEmbassy}
+                          onClick={() => handleStatusChange(
+                            [row.id],
+                            "Dropped-Off Sent To Embassy",
+                            row.status,
+                            'single'
+                          )}
                           disabled={isSentToEmbassy}
                         >
                           SEND TO EMBASSY

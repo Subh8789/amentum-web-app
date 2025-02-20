@@ -243,7 +243,7 @@ const DisabledFormPickup = ({ formData }) => {
                                         </Col>
                                     </Row>
 
-                                    {showPickupForm && (
+                                    {showPickupForm && formData.status === "Ready for Pick-Up" &&(
                                     <>
                                     <Row className="g-4 mb-4">
                                         <Col md={4}>
@@ -395,7 +395,7 @@ PRINT
 </div> */}
                                                 <div
                                                     className="py-3 cursor-pointer"
-                                                    style={selectedTab === 'MANAGE PICK-UP' ? activeStyle : {}}
+                                                    style={selectedTab === 'MANAGE PICK-UP' && formData.status === "Ready for Pick-Up"? activeStyle : {}}
                                                     onClick={() => handleTabClick('MANAGE PICK-UP')}
                                                 >
                                                     MANAGE PICK-UP

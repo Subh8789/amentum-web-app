@@ -1,0 +1,61 @@
+"use client";
+import React from 'react'
+import { useState,useEffect } from 'react';
+import OfficerReportPickup from '@/components/report/OfficerReportPickup';
+
+function PickupOfficerReport() {
+
+ const [pickupData,setPickupData] = useState([])
+   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
+    const BASE_URL = "https://app.swglobalstaging.com";
+    const POST_KEY = "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253"
+    const GET_APPOINTMENT_DROP = `${BASE_URL}/api/v1/waybill/track/appointments`;
+  
+  
+    useEffect(() => {
+
+       console.log("under dropoff page")
+        const fetchPickupData = async () => {
+          setLoading(true);
+          setError(null);
+    
+          const myHeaders = new Headers();
+          myHeaders.append("Accept", "application/json");
+          myHeaders.append("post-key", POST_KEY);
+    
+          const requestOptions = {
+            method: "GET",
+            headers: myHeaders,
+            redirect: "follow"
+          };
+    
+          try {
+            const response = await fetch(`${GET_APPOINTMENT_DROP}?type=pick`, requestOptions);
+            const data = await response.json();
+            if (data.responseCode === 200 && data.success) {
+                setPickupData(data?.data?.data);
+            } else {
+              setError("No data found ");
+            }
+          } catch (error) {
+            console.error("Error fetching data:", error);
+            setError("Failed to fetch dropoff data. Please try again.");
+          } finally {
+            setLoading(false);
+          }
+        };
+    
+        fetchPickupData();
+      }, []);
+  
+
+  return (
+   <>
+      <OfficerReportPickup pickupData={pickupData} loading={loading} error={error} />
+    </>
+  )
+}
+
+export default PickupOfficerReport

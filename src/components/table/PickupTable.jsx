@@ -7,22 +7,14 @@ import {
     Form,
     Button,
     Container,
-    Nav,
-    Navbar,
     Pagination,
     Dropdown,
-    InputGroup,
     Modal, // Added Modal component
 
 } from "react-bootstrap";
 import {
-    ChevronFirst,
-    ChevronLast,
-    ChevronLeft,
-    ChevronRight,
+    
     MoreVertical,
-    Search,
-    Download,
 } from "lucide-react";
 
 const StatusIcon = ({ status }) => {
@@ -84,7 +76,7 @@ const PickupTable = ({ pickupData, loading, error }) => {
     const [selectedRows, setSelectedRows] = useState([]);
     const router = useRouter();
 
-    // Add states for modal
+    // Added states for modal
     const [showModal, setShowModal] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState("");
     const [currentStatus, setCurrentStatus] = useState("");
@@ -238,7 +230,7 @@ const PickupTable = ({ pickupData, loading, error }) => {
                             <Dropdown.Item className="fw-semibold text-primary">
                                 DHL (DHL intake Vs processed)
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary">
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/officerReport-pickup")}>
                                 Officer Report
                             </Dropdown.Item>
                             <Dropdown.Item className="fw-semibold text-primary">
@@ -366,9 +358,9 @@ const PickupTable = ({ pickupData, loading, error }) => {
                                     <td>{row.firstName}</td>
                                     <td>{row.email}</td>
                                     <td>{row.phoneNumber}</td>
-                                    <td>{row.intakeDateOIS}</td>
+                                    <td>{row.oisIntake}</td>
                                     <td>{row.officer}</td>
-                                    <td>{row.dhlFlag}</td>
+                                   { row.isDhl && <td>DHL</td>}
                                     <td>
                                         <StatusIcon status={row.status} />
                                     </td>
