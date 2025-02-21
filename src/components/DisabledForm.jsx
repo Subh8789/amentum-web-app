@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Nav, Table } from "react-bootstrap";
+import React, { useState} from "react";
+import { Container, Row, Col, Button,Table } from "react-bootstrap";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

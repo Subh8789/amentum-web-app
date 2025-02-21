@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useCallback } from "react";
-import { Container, Row, Col, Button, Nav, Table, Form } from "react-bootstrap";
-import { ArrowLeft, Upload } from "lucide-react";
+import React, { useState } from "react";
+import { Container, Row, Col, Button, Table, Form } from "react-bootstrap";
+import { ArrowLeft} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import "../utils/TrackingForm.css"
@@ -99,10 +99,9 @@ const TrackingForm = ({ formData}) => {
         const [error, setError] = useState(null);
     
 
-    const BASE_URL = "https://app.swglobalstaging.com";
-
-  const POST_KEY = "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253";
-  const CREATE_API_URL = `${BASE_URL}/api/v1/waybill/track/appointments/create`;
+        const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+        const POST_KEY = process.env.NEXT_PUBLIC_POST_KEY
+    const CREATE_API_URL = `${BASE_URL}/api/v1/waybill/track/appointments/create`;
 
     const handleCheckboxChange = (event) => {
         const { value, checked } = event.target;

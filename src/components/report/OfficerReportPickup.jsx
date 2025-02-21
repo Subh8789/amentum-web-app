@@ -21,7 +21,7 @@ const OfficerReportPickup = ({ pickupData = [], loading, error }) => {
     const [filteredData, setFilteredData] = useState([]);
     const [selectedUser, setSelectedUser] = useState("");
 
-    console.log("selectedUser",selectedUser)
+    console.log("selectedUser", selectedUser)
 
     const router = useRouter();
 
@@ -62,127 +62,45 @@ const OfficerReportPickup = ({ pickupData = [], loading, error }) => {
         setCurrentPage(1);
     };
 
-  
-    // const handleDownloadReport = async () => {
 
-    //     if (!startDate || !endDate) {
-    //         alert("Please select a start and end date.");
-    //         return;
-    //     }
+    //handle report download
+    const handleDownloadReport = async () => {
+        if (!startDate || !endDate) {
+            alert("Please select a start and end date.");
+            return;
+        }
 
-    //     const apiUrl = `https://app.swglobalstaging.com/api/v1/waybill/track/report?type=pick&startDate=${startDate}&endDate=${endDate}&user=`;
-    //     const headers = new Headers();
-    //     headers.append("Accept", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    //     headers.append("post-key", "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253");
+        try {
+            const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+            const POST_KEY = process.env.NEXT_PUBLIC_POST_KEY
 
-    //     try {
-    //         const response = await fetch(apiUrl, {
-    //             method: "GET",
-    //             headers: headers,
-    //         });
+            const apiUrl = `${BASE_URL}/api/v1/waybill/track/report?type=pick&startDate=${startDate}&endDate=${endDate}&user=${selectedUser}`;
 
-    //         if (!response.ok) throw new Error("Failed to download report");
+            //console.log("apiUrl",apiUrl)
+            const response = await fetch(apiUrl, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "post-key": POST_KEY,
+                },
+            });
 
-    //         const blob = await response.blob();
-    //         const url = window.URL.createObjectURL(blob);
-    //         const a = document.createElement("a");
-    //         a.href = url;
-    //         a.download = `Pickup_${startDate}_to_${endDate}.xlsx`;
-    //         document.body.appendChild(a);
-    //         a.click();
-    //         a.remove();
-    //         window.URL.revokeObjectURL(url);
+            if (!response.ok) throw new Error("Failed to download report");
 
-    //         alert(`Report from ${startDate} to ${endDate} downloaded successfully.`);
-    //         resetFilters(); // Reset filters after successful download
-    //     } catch (error) {
-    //         console.error("Error downloading report:", error);
-    //         alert("Failed to download the report. Please try again.");
-    //     }
-    // };
+            const blob = await response.blob();
 
-    // Handle Download Report
-// const handleDownloadReport = async () => {
-//     if (!startDate || !endDate) {
-//       alert("Please select a start and end date.");
-//       return;
-//     }
-  
-//     try {
-//       const BASE_URL = "https://app.swglobalstaging.com"
-//       const POST_KEY = "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253"
-  
-//       const apiUrl = `${BASE_URL}/api/v1/waybill/track/report?type=pick&startDate=${startDate}&endDate=${endDate}&user=`;
-  
-//       const response = await fetch(apiUrl, {
-//         method: "GET",
-//         headers: {
-//           "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-//           "post-key": POST_KEY,
-//         },
-//       });
-  
-//       if (!response.ok) throw new Error("Failed to download report");
-  
-//       const blob = await response.blob();
-//       const fileName = `Pickup_${startDate}_to_${endDate}.xlsx`;
-  
-//       // Automatically trigger the download
-//       const url = URL.createObjectURL(blob);
-//       navigator.clipboard.writeText(fileName); // Copies filename for reference
-//       const a = document.createElement("a");
-//       a.href = url;
-//       a.download = fileName;
-//       a.click();
-//       URL.revokeObjectURL(url); // Clean up the URL object
-  
-//       alert(`Report downloaded successfully.`);
-//       resetFilters(); // Reset filters after successful download
-//     } catch (error) {
-//       console.error("Error downloading report:", error);
-//       alert("Failed to download the report. Please try again.");
-//     }
-//   };
-  
+            // Automatically trigger file download
+            const url = URL.createObjectURL(blob);
+            window.location.href = url;
+            URL.revokeObjectURL(url); // Clean up the object URL
 
-   //handle report download
-   const handleDownloadReport = async () => {
-    if (!startDate || !endDate) {
-      alert("Please select a start and end date.");
-      return;
-    }
-  
-    try {
-      const BASE_URL = "https://app.swglobalstaging.com"
-      const POST_KEY = "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253"
-  
-      const apiUrl = `${BASE_URL}/api/v1/waybill/track/report?type=pick&startDate=${startDate}&endDate=${endDate}&user=${selectedUser}`;
-      
-      console.log("apiUrl",apiUrl)
-      const response = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          "post-key": POST_KEY,
-        },
-      });
-  
-      if (!response.ok) throw new Error("Failed to download report");
-  
-      const blob = await response.blob();
-  
-      // Automatically trigger file download
-      const url = URL.createObjectURL(blob);
-      window.location.href = url;
-      URL.revokeObjectURL(url); // Clean up the object URL
-  
-      alert("Report downloaded successfully.");
-      resetFilters(); // Reset filters after successful download
-    } catch (error) {
-      console.error("Error downloading report:", error);
-      alert("Failed to download the report. Please try again.");
-    }
-  };
+            alert("Report downloaded successfully.");
+            resetFilters(); // Reset filters after successful download
+        } catch (error) {
+            console.error("Error downloading report:", error);
+            alert("Failed to download the report. Please try again.");
+        }
+    };
 
 
     const currentRecords = useMemo(() => {
@@ -218,10 +136,10 @@ const OfficerReportPickup = ({ pickupData = [], loading, error }) => {
                             <Dropdown.Item className="fw-semibold text-primary">
                                 DHL (DHL intake Vs processed)
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/officerReport-pickup")}>
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/pick-up/officerReport-pickup")}>
                                 Officer Report
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/acraDeliveryreport")}>
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/pick-up/acraDeliveryreport")}>
                                 Download Accra Delivery Report
                             </Dropdown.Item>
                         </Dropdown.Menu>

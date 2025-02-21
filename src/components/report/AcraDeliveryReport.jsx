@@ -58,46 +58,46 @@ const AcraDeliveryReport = ({ pickupData = [], loading, error }) => {
         setCurrentPage(1);
     };
 
-    
-   
+
+
     // handle download report
     const handleDownloadReport = async () => {
         if (!startDate || !endDate) {
-          alert("Please select a start and end date.");
-          return;
+            alert("Please select a start and end date.");
+            return;
         }
-      
+
         try {
-          const BASE_URL = "https://app.swglobalstaging.com"
-          const POST_KEY = "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253"
-      
-          const apiUrl = `${BASE_URL}/api/v1/waybill/track/report?type=pick&startDate=${startDate}&endDate=${endDate}`;
-      
-          const response = await fetch(apiUrl, {
-            method: "GET",
-            headers: {
-              "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-              "post-key": POST_KEY,
-            },
-          });
-      
-          if (!response.ok) throw new Error("Failed to download report");
-      
-          const blob = await response.blob();
-      
-          // Automatically trigger file download
-          const url = URL.createObjectURL(blob);
-          window.location.href = url;
-          URL.revokeObjectURL(url); // Clean up the object URL
-      
-          alert("Report downloaded successfully.");
-          resetFilters(); // Reset filters after successful download
+            const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+            const POST_KEY = process.env.NEXT_PUBLIC_POST_KEY
+
+            const apiUrl = `${BASE_URL}/api/v1/waybill/track/report?type=pick&startDate=${startDate}&endDate=${endDate}`;
+
+            const response = await fetch(apiUrl, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "post-key": POST_KEY,
+                },
+            });
+
+            if (!response.ok) throw new Error("Failed to download report");
+
+            const blob = await response.blob();
+
+            // Automatically trigger file download
+            const url = URL.createObjectURL(blob);
+            window.location.href = url;
+            URL.revokeObjectURL(url); // Clean up the object URL
+
+            alert("Report downloaded successfully.");
+            resetFilters(); // Reset filters after successful download
         } catch (error) {
-          console.error("Error downloading report:", error);
-          alert("Failed to download the report. Please try again.");
+            console.error("Error downloading report:", error);
+            alert("Failed to download the report. Please try again.");
         }
-      };
-      
+    };
+
 
     const currentRecords = useMemo(() => {
         if (!filteredData || filteredData.length === 0) return [];
@@ -110,7 +110,7 @@ const AcraDeliveryReport = ({ pickupData = [], loading, error }) => {
         <Container fluid style={{ padding: "0 40px", marginBottom: "20rem" }}>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 style={{ color: "#004B87", fontSize: "1.5rem", fontWeight: "bold" }}>
-                  ACRA-DELIVERY-REPORT
+                    ACRA-DELIVERY-REPORT
                 </h2>
                 <div className="d-flex gap-2">
                     <Dropdown align="end">
@@ -131,10 +131,10 @@ const AcraDeliveryReport = ({ pickupData = [], loading, error }) => {
                             <Dropdown.Item className="fw-semibold text-primary">
                                 DHL (DHL intake Vs processed)
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/officerReport-pickup")}>
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/pick-up/officerReport-pickup")}>
                                 Officer Report
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/acraDeliveryreport")}>
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/pick-up/acraDeliveryreport")}>
                                 Download Accra Delivery Report
                             </Dropdown.Item>
                         </Dropdown.Menu>

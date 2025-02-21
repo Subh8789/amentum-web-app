@@ -64,13 +64,13 @@ const DropOffReport = ({ dropoffData = [], loading, error }) => {
       alert("Please select a start and end date.");
       return;
     }
-  
+
     try {
-      const BASE_URL = "https://app.swglobalstaging.com"
-      const POST_KEY = "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253"
-  
+      const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+      const POST_KEY = process.env.NEXT_PUBLIC_POST_KEY
+
       const apiUrl = `${BASE_URL}/api/v1/waybill/track/report?type=drop&startDate=${startDate}&endDate=${endDate}&service`;
-  
+
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -78,16 +78,16 @@ const DropOffReport = ({ dropoffData = [], loading, error }) => {
           "post-key": POST_KEY,
         },
       });
-  
+
       if (!response.ok) throw new Error("Failed to download report");
-  
+
       const blob = await response.blob();
-  
+
       // Automatically trigger file download
       const url = URL.createObjectURL(blob);
       window.location.href = url;
       URL.revokeObjectURL(url); // Clean up the object URL
-  
+
       alert("Report downloaded successfully.");
       resetFilters(); // Reset filters after successful download
     } catch (error) {
@@ -95,7 +95,7 @@ const DropOffReport = ({ dropoffData = [], loading, error }) => {
       alert("Failed to download the report. Please try again.");
     }
   };
-  
+
 
 
   const currentRecords = useMemo(() => {
@@ -121,13 +121,13 @@ const DropOffReport = ({ dropoffData = [], loading, error }) => {
               Report
             </Dropdown.Toggle>
             <Dropdown.Menu className='drop-menu'>
-              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/dropoff-report")}>
+              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/dropoff/dropoff-report")}>
                 DROPOFF/ COLLECTION REPORT
               </Dropdown.Item>
-              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/officerReport-ois")}>
+              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/dropoff/officerReport-ois")}>
                 OFFICER REPORT OIS
               </Dropdown.Item>
-              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/officerReport-Dhl")}>
+              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/dropoff/officerReport-Dhl")}>
                 OFFICER REPORT DHL
               </Dropdown.Item>
             </Dropdown.Menu>

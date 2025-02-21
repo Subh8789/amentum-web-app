@@ -118,8 +118,8 @@ const PickupTable = ({ pickupData, loading, error }) => {
         );
     };
 
-    const BASE_URL = "https://app.swglobalstaging.com";
-    const POST_KEY = "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253"
+    const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+    const POST_KEY = process.env.NEXT_PUBLIC_POST_KEY
     const UPDATE_API_URL = `${BASE_URL}/api/v1/waybill/track/appointments/update`;
 
 
@@ -230,10 +230,10 @@ const PickupTable = ({ pickupData, loading, error }) => {
                             <Dropdown.Item className="fw-semibold text-primary">
                                 DHL (DHL intake Vs processed)
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/officerReport-pickup")}>
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/pick-up/officerReport-pickup")}>
                                 Officer Report
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/acraDeliveryreport")}>
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/pick-up/acraDeliveryreport")}>
                                 Download Accra Delivery Report
                             </Dropdown.Item>
                         </Dropdown.Menu>
@@ -308,7 +308,8 @@ const PickupTable = ({ pickupData, loading, error }) => {
                                 />
                             </th>
                             <th className="border-0 py-3">Passport Number</th>
-                            <th className="border-0 py-3">Source Manifest</th>
+                            {/* yet to be decided need to show or not */}
+                            {/* <th className="border-0 py-3">Source Manifest</th> */}
                             <th className="border-0 py-3">Center</th>
                             <th className="border-0 py-3">Surname</th>
                             <th className="border-0 py-3">Given Name</th>
@@ -352,7 +353,8 @@ const PickupTable = ({ pickupData, loading, error }) => {
                                             {row.passportNumber}
                                         </Link>
                                     </td>
-                                    <td>{row.sourceManifest}</td>
+                                     {/* data is not coming hence commented out */}
+                                    {/* <td>{row.sourceManifest}</td> */}
                                     <td>{row.center}</td>
                                     <td>{row.surname}</td>
                                     <td>{row.firstName}</td>
