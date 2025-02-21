@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 
 import "../../utils/TrackingForm.css";
+import Link from "next/link";
 
 
 const LoadingModal = () => (
@@ -67,7 +68,7 @@ const DisabledFormPickup = ({ formData }) => {
     };
     const validateForm = () => {
         const errors = [];
-        
+
         if (!collectionOption.hasCollectionOption) { // If Proxy Pick-up is selected
             if (!representativeName.trim()) {
                 errors.push("Representative name is required for proxy pick-up.");
@@ -76,7 +77,7 @@ const DisabledFormPickup = ({ formData }) => {
                 errors.push("Notes are required for proxy pick-up.");
             }
         }
-        
+
         return errors;
     };
 
@@ -243,118 +244,118 @@ const DisabledFormPickup = ({ formData }) => {
                                         </Col>
                                     </Row>
 
-                                    {showPickupForm && formData.status === "Ready for Pick-Up" &&(
-                                    <>
-                                    <Row className="g-4 mb-4">
-                                        <Col md={4}>
-                                            <label
-                                                className="text-muted mb-2"
-                                                style={{ fontSize: "12px", letterSpacing: "0.5px" }}
-                                            >
-                                                Collection Option
-                                            </label>
-                                            <div
-                                                className="p-3 rounded"
-                                                style={{ backgroundColor: "#f3f7fb", color: "#004B87" }}
-                                            >
+                                    {showPickupForm && formData.status === "Ready for Pick-Up" && (
+                                        <>
+                                            <Row className="g-4 mb-4">
+                                                <Col md={4}>
+                                                    <label
+                                                        className="text-muted mb-2"
+                                                        style={{ fontSize: "12px", letterSpacing: "0.5px" }}
+                                                    >
+                                                        Collection Option
+                                                    </label>
+                                                    <div
+                                                        className="p-3 rounded"
+                                                        style={{ backgroundColor: "#f3f7fb", color: "#004B87" }}
+                                                    >
 
-                                                <Form.Check
-                                                    type="radio"
-                                                    id="have-document-no"
-                                                    name="hasCollectionOption"
-                                                    label="In-Person"
-                                                    checked={collectionOption.hasCollectionOption}
-                                                    onChange={() =>
-                                                        setCollectionOption((prev) => ({
-                                                            ...prev,
-                                                            hasCollectionOption: true,
-                                                            comments: "", // Clear comments when no document
-                                                        }))
-                                                    }
-                                                />
-                                                <Form.Check
-                                                    type="radio"
-                                                    id="have-document-yes"
-                                                    name="hasCollectionOption"
-                                                    label="Proxy Pick-up"
-                                                    checked={!collectionOption.hasCollectionOption}
-                                                    onChange={() =>
-                                                        setCollectionOption((prev) => ({
-                                                            ...prev,
-                                                            hasCollectionOption: false,
-                                                        }))
-                                                    }
-                                                    className="mb-2"
-                                                />
-                                            </div>
-                                        </Col>
+                                                        <Form.Check
+                                                            type="radio"
+                                                            id="have-document-no"
+                                                            name="hasCollectionOption"
+                                                            label="In-Person"
+                                                            checked={collectionOption.hasCollectionOption}
+                                                            onChange={() =>
+                                                                setCollectionOption((prev) => ({
+                                                                    ...prev,
+                                                                    hasCollectionOption: true,
+                                                                    comments: "", // Clear comments when no document
+                                                                }))
+                                                            }
+                                                        />
+                                                        <Form.Check
+                                                            type="radio"
+                                                            id="have-document-yes"
+                                                            name="hasCollectionOption"
+                                                            label="Proxy Pick-up"
+                                                            checked={!collectionOption.hasCollectionOption}
+                                                            onChange={() =>
+                                                                setCollectionOption((prev) => ({
+                                                                    ...prev,
+                                                                    hasCollectionOption: false,
+                                                                }))
+                                                            }
+                                                            className="mb-2"
+                                                        />
+                                                    </div>
+                                                </Col>
 
-                                        {!collectionOption.hasCollectionOption &&
-                                            <Col md={4}>
-                                                <label
-                                                    className="text-muted mb-2"
-                                                    style={{ fontSize: "12px", letterSpacing: "0.5px" }}
-                                                >
-                                                    REPRESENTATIVE NAME
-                                                </label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    rows={3}
-                                                    name="representativeName"
-                                                    placeholder="Enter proxy person name"
-                                                    value={additionalComments}
-                                                    onChange={(e) => setRepresentativeName(e.target.value)}
-                                                    className="rounded"
+                                                {!collectionOption.hasCollectionOption &&
+                                                    <Col md={4}>
+                                                        <label
+                                                            className="text-muted mb-2"
+                                                            style={{ fontSize: "12px", letterSpacing: "0.5px" }}
+                                                        >
+                                                            REPRESENTATIVE NAME
+                                                        </label>
+                                                        <Form.Control
+                                                            as="textarea"
+                                                            rows={3}
+                                                            name="representativeName"
+                                                            placeholder="Enter proxy person name"
+                                                            value={additionalComments}
+                                                            onChange={(e) => setRepresentativeName(e.target.value)}
+                                                            className="rounded"
+                                                            style={{
+                                                                backgroundColor: "#f3f7fb",
+                                                                color: "#004B87",
+                                                                resize: "none",
+                                                            }}
+                                                            required
+                                                        />
+                                                    </Col>
+                                                }
+                                                {/* {!collectionOption.hasCollectionOption && */}
+                                                <Col md={4}>
+                                                    <label
+                                                        className="text-muted mb-2"
+                                                        style={{ fontSize: "12px", letterSpacing: "0.5px" }}
+                                                    >
+                                                        Notes*
+                                                    </label>
+                                                    <Form.Control
+                                                        as="textarea"
+                                                        rows={3}
+                                                        name="additionalComments"
+                                                        placeholder="Enter additional comments"
+                                                        value={additionalComments}
+                                                        onChange={(e) => setAdditionalComments(e.target.value)}
+                                                        className="rounded"
+                                                        style={{
+                                                            backgroundColor: "#f3f7fb",
+                                                            color: "#004B87",
+                                                            resize: "none",
+                                                        }}
+                                                        required
+                                                    />
+                                                </Col>
+                                            </Row>
+
+                                            <div className="text-end">
+                                                <Button
+                                                    onClick={handleSubmit}
+                                                    className="px-4 py-2 border-0"
                                                     style={{
-                                                        backgroundColor: "#f3f7fb",
-                                                        color: "#004B87",
-                                                        resize: "none",
+                                                        backgroundColor: "#8BC34A",
+                                                        color: "white",
+                                                        borderRadius: 0,
                                                     }}
-                                                    required
-                                                />
-                                            </Col>
-                                        }
-                                        {/* {!collectionOption.hasCollectionOption && */}
-                                        <Col md={4}>
-                                            <label
-                                                className="text-muted mb-2"
-                                                style={{ fontSize: "12px", letterSpacing: "0.5px" }}
-                                            >
-                                                Notes*
-                                            </label>
-                                            <Form.Control
-                                                as="textarea"
-                                                rows={3}
-                                                name="additionalComments"
-                                                placeholder="Enter additional comments"
-                                                value={additionalComments}
-                                                onChange={(e) => setAdditionalComments(e.target.value)}
-                                                className="rounded"
-                                                style={{
-                                                    backgroundColor: "#f3f7fb",
-                                                    color: "#004B87",
-                                                    resize: "none",
-                                                }}
-                                                required
-                                            />
-                                        </Col>
-                                    </Row>
-
-                                    <div className="text-end">
-                                        <Button
-                                            onClick={handleSubmit}
-                                            className="px-4 py-2 border-0"
-                                            style={{
-                                                backgroundColor: "#8BC34A",
-                                                color: "white",
-                                                borderRadius: 0,
-                                            }}
-                                        >
-                                            SUBMIT
-                                        </Button>
-                                    </div>
-</>
-)}
+                                                >
+                                                    SUBMIT
+                                                </Button>
+                                            </div>
+                                        </>
+                                    )}
                                     {/* Attached Documents Section */}
                                     <div className="mt-5">
                                         <div
@@ -386,16 +387,25 @@ const DisabledFormPickup = ({ formData }) => {
                                                 >
                                                     EVENT/TRACKING
                                                 </div>
-                                                {/* <div
-className="py-3 cursor-pointer"
-style={selectedTab === 'PRINT' ? activeStyle : { color: '#6c757d' }}
-onClick={() => handleTabClick('PRINT')}
->
-PRINT
-</div> */}
                                                 <div
                                                     className="py-3 cursor-pointer"
-                                                    style={selectedTab === 'MANAGE PICK-UP' && formData.status === "Ready for Pick-Up"? activeStyle : {}}
+                                                    style={selectedTab === 'PRINT' ? activeStyle : { color: '#6c757d' }}
+                                                    onClick={() => handleTabClick('PRINT')}
+
+                                                >
+                                                    <Link
+                                                        href={formData.collectionReceipt}
+                                                        target="_blank"
+                                                        style={ {textDecoration: "none"} }
+                                                        onClick={() => handleTabClick('PRINT')}
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        PRINT
+                                                    </Link>
+                                                </div>
+                                                <div
+                                                    className="py-3 cursor-pointer"
+                                                    style={selectedTab === 'MANAGE PICK-UP' && formData.status === "Ready for Pick-Up" ? activeStyle : {}}
                                                     onClick={() => handleTabClick('MANAGE PICK-UP')}
                                                 >
                                                     MANAGE PICK-UP

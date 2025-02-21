@@ -5,6 +5,7 @@ import React from 'react';
 import "./applicationDetails.css"
 import { useRouter } from 'next/navigation';
 import DisabledFormPickup from '@/components/forms/DisabledFormPickup';
+import EnabledFormPickup from '@/components/forms/EnabledFormPickup';
 
 import { useState,useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -96,15 +97,36 @@ function page() {
         <DisabledForm formData={formData}/>
     } */}
 
-{formData && formData.status 
+{/* {formData && formData.status 
         ? formData.status.includes("Appointment booked") 
           ? <TrackingForm formData={formData} />
           : formData.status.includes("Dropped") 
             ? <DisabledForm formData={formData} />
             : <DisabledFormPickup formData={formData} />
         : <DisabledFormPickup formData={formData} />
-      }
+      } */}
 
+{/* {formData && (
+  formData.status.includes("Dropped") ? (
+    <DisabledForm formData={formData} />
+  ) : formData.type === "drop" && formData.status === "Appointment booked" ? (
+    <TrackingForm formData={formData} />
+  ) : formData.type === "pick" && formData.status === "Appointment booked" ? (
+    <DisabledFormPickup formData={formData} />
+  ) : null
+)} */}
+
+{formData && (
+  formData.status.includes("Dropped") ? (
+    <DisabledForm formData={formData} />
+  ) : formData.type === "drop" && formData.status === "Appointment booked" ? (
+    <TrackingForm formData={formData} />
+  ) : formData.type === "pick" && formData.status === "Appointment booked" ? (
+    <EnabledFormPickup formData={formData} />
+  ) : formData.type === "pick" && formData.status !== "Appointment booked" ? (
+    <DisabledFormPickup formData={formData} />
+  ) : null
+)}
     </>
   )
 }

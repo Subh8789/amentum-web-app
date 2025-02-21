@@ -233,7 +233,7 @@ const PickupTable = ({ pickupData, loading, error }) => {
                             <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/officerReport-pickup")}>
                                 Officer Report
                             </Dropdown.Item>
-                            <Dropdown.Item className="fw-semibold text-primary">
+                            <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/acraDeliveryreport")}>
                                 Download Accra Delivery Report
                             </Dropdown.Item>
                         </Dropdown.Menu>

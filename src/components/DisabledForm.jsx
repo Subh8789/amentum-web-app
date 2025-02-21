@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Nav, Table } from "react-bootstrap";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 
 
@@ -161,7 +162,14 @@ const DisabledForm = ({ formData, loading, error }) => {
                                         >
                                             EVENT/TRACKING
                                         </div>
-                                        <div className="py-3 text-muted">PRINT</div>
+                                        <div className="py-3 text-muted"><Link
+                                                        href={formData.collectionReceipt}
+                                                        target="_blank"
+                                                        style={ {textDecoration: "none"} }
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        PRINT
+                                                    </Link></div>
                                         {/* <div className="py-3 text-muted">MANAGE PICK-UP</div> */}
                                     </div>
                                 </div>

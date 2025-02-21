@@ -55,51 +55,51 @@ const OfficerReportDhl = ({ dropoffData = [], loading, error }) => {
     const resetFilters = () => {
         setStartDate("");
         setEndDate("");
-        setSelectedUser("All");
+        setSelectedUser("");
         setFilteredData(dropoffData);
         setCurrentPage(1);
     };
 
-    // Handle Download Report
-    const handleDownloadReport = async () => {
+  
 
-        if (!startDate || !endDate) {
-            alert("Please select a start and end date.");
-            return;
-        }
 
-        const apiUrl = `https://app.swglobalstaging.com/api/v1/waybill/track/report?type=drop&startDate=${startDate}&endDate=${endDate}&service=dhl&user=${selectedUser}`;
-
-        const headers = new Headers();
-        headers.append("Accept", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        headers.append("post-key", "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253");
-
-        try {
-            const response = await fetch(apiUrl, {
-                method: "GET",
-                headers: headers,
-            });
-
-            if (!response.ok) throw new Error("Failed to download report");
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `DropOff_Report_${startDate}_to_${endDate}.xlsx`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-
-            alert(`Report from ${startDate} to ${endDate} downloaded successfully.`);
-            resetFilters(); // Reset filters after successful download
-        } catch (error) {
-            console.error("Error downloading report:", error);
-            alert("Failed to download the report. Please try again.");
-        }
-    };
-
+     //handle report download
+  const handleDownloadReport = async () => {
+    if (!startDate || !endDate) {
+      alert("Please select a start and end date.");
+      return;
+    }
+  
+    try {
+      const BASE_URL = "https://app.swglobalstaging.com"
+      const POST_KEY = "f11e8d98b515c1d53290f3811bd01e5a2416a9315a8974d69cd939a1fce6b253"
+  
+      const apiUrl = `${BASE_URL}/api/v1/waybill/track/report?type=drop&startDate=${startDate}&endDate=${endDate}&service=dhl&user=${selectedUser}`;
+  
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "post-key": POST_KEY,
+        },
+      });
+  
+      if (!response.ok) throw new Error("Failed to download report");
+  
+      const blob = await response.blob();
+  
+      // Automatically trigger file download
+      const url = URL.createObjectURL(blob);
+      window.location.href = url;
+      URL.revokeObjectURL(url); // Clean up the object URL
+  
+      alert("Report downloaded successfully.");
+      resetFilters(); // Reset filters after successful download
+    } catch (error) {
+      console.error("Error downloading report:", error);
+      alert("Failed to download the report. Please try again.");
+    }
+  };
 
     const currentRecords = useMemo(() => {
         if (!filteredData || filteredData.length === 0) return [];
