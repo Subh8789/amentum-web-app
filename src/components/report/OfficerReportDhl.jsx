@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation";
 
 import "./filter.css";
 
+import useReportDownloader from "@/customHooks/useReportDownloader";
+
 const OfficerReportDhl = ({ dropoffData = [], loading, error }) => {
     console.log("dropoffData", dropoffData);
 
@@ -60,46 +62,26 @@ const OfficerReportDhl = ({ dropoffData = [], loading, error }) => {
         setCurrentPage(1);
     };
 
+    const type ="drop";
+    const service="dhl";
+    const user = selectedUser || '';
 
 
-
-    //handle report download
+    const { downloadReport, isLoading } = useReportDownloader(startDate, endDate, type, service, user );
+  
     const handleDownloadReport = async () => {
-        if (!startDate || !endDate) {
-            alert("Please select a start and end date.");
-            return;
-        }
-
-        try {
-            const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
-            const POST_KEY = process.env.NEXT_PUBLIC_POST_KEY
-
-            const apiUrl = `${BASE_URL}/api/v1/waybill/track/report?type=drop&startDate=${startDate}&endDate=${endDate}&service=dhl&user=${selectedUser}`;
-
-            const response = await fetch(apiUrl, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    "post-key": POST_KEY,
-                },
-            });
-
-            if (!response.ok) throw new Error("Failed to download report");
-
-            const blob = await response.blob();
-
-            // Automatically trigger file download
-            const url = URL.createObjectURL(blob);
-            window.location.href = url;
-            URL.revokeObjectURL(url); // Clean up the object URL
-
-            alert("Report downloaded successfully.");
-            resetFilters(); // Reset filters after successful download
-        } catch (error) {
-            console.error("Error downloading report:", error);
-            alert("Failed to download the report. Please try again.");
-        }
-    };
+      const success = await downloadReport({
+        startDate,
+        endDate,
+        type,
+        service,
+        user
+      });
+      if (success) {
+        resetFilters(); // Your reset function
+      }
+    
+    }
 
     const currentRecords = useMemo(() => {
         if (!filteredData || filteredData.length === 0) return [];

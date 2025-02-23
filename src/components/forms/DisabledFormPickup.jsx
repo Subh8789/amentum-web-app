@@ -4,37 +4,23 @@ import { Container, Row, Col, Button, Nav, Table, Form } from "react-bootstrap";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import ErrorModal from "../modals/ErrorModal";
+import LoadingModal from "../modals/LoadingModal";
 
 import "../../utils/TrackingForm.css";
 import Link from "next/link";
 
 
-const LoadingModal = () => (
-    <div className="modal-overlay">
-        <div className="modal-content">
-            <div className="loading-spinner"></div>
-            <p>Processing your request...</p>
-        </div>
-    </div>
-);
 
-const ErrorModal = ({ message, onClose }) => (
-    <div className="modal-overlay">
-        <div className="modal-content">
-            <h3 className="error-title">Error</h3>
-            <p className="error-message">{message}</p>
-            <button className="modal-button" onClick={onClose}>
-                Close
-            </button>
-        </div>
-    </div>
-);
 
 const DisabledFormPickup = ({ formData }) => {
+
+    console.log("DisabledFormPickup");
+
     const [selectedTab, setSelectedTab] = useState('EVENT/TRACKING');
 
     const [collectionOption, setCollectionOption] = useState({
-        hasCollectionOption: false,
+        type: "self", // default value
         comments: "",
     });
     const [showPickupForm, setShowPickupForm] = useState(false);
@@ -69,7 +55,7 @@ const DisabledFormPickup = ({ formData }) => {
     const validateForm = () => {
         const errors = [];
 
-        if (!collectionOption.hasCollectionOption) { // If Proxy Pick-up is selected
+        if (collectionOption.type === "proxy") { // If Proxy Pick-up is selected
             if (!representativeName.trim()) {
                 errors.push("Representative name is required for proxy pick-up.");
             }
@@ -101,15 +87,17 @@ const DisabledFormPickup = ({ formData }) => {
                 },
                 body: JSON.stringify({
                     application: formData.id,
-                    status: "Dropped-Off At OIS",
+                    status: formData.status,  //Optional
+                    // visaType: ""   //Optional
                     user: "Mr. Archie",
-                    additionalComments: !collectionOption.hasCollectionOption ? additionalComments : "",
-                    representativeName: !collectionOption.hasCollectionOption ? representativeName : "",
+                    collectedBy: collectionOption.type, // This will be either "self" or "proxy"
+                    comments: collectionOption.type === "proxy" ? additionalComments : "",
+                    proxyName: collectionOption.type === "proxy" ? representativeName : "",
                 })
             });
 
             if (!response.ok) {
-                throw new Error(response.status === 400 ? "Bad Request" : "No Results Found");
+                throw new Error(response.status === 400 ? response.data : "No Results Found");
             }
 
             await response.json();
@@ -213,36 +201,79 @@ const DisabledFormPickup = ({ formData }) => {
                         <Container fluid style={{ padding: "2rem 40px" }}>
                             <Row>
                                 <Col md={7} className="p-4 bg-white">
-                                    {/* Form Fields */}
-                                    <Row className="g-4 mb-4">
-                                        <Col md={4}>
-                                            <FormField label="TRACKING NO." value={formData.trackingId} />
-                                        </Col>
-                                        <Col md={4}>
-                                            <FormField label="FIRSTNAME" value={formData.firstName} />
-                                        </Col>
-                                        <Col md={4}>
-                                            <FormField label="SUR NAME" value={formData.surname} />
-                                        </Col>
-                                    </Row>
 
-                                    <Row className="g-4 mb-4">
-                                        <Col md={4}>
-                                            <FormField label="PASSPORT NO." value={formData.passportNumber} />
-                                        </Col>
-                                        {/* <Col md={4}>
+                                    {formData && formData.status === "Appointment booked" ?
+
+                                        //    {/* Form Fields when status is Appointment booked */}
+                                        <>
+                                            {/* Form Fields */}
+                                            <Row className="g-4 mb-4">
+                                                <Col md={4}>
+                                                    <FormField label="TRACKING NO." value={formData.trackingId} />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <FormField label="FIRSTNAME" value={formData.name} />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <FormField label="PHONE NO." value={formData.phone} />
+                                                </Col>
+
+                                            </Row>
+
+                                            <Row className="g-4 mb-4">
+                                                <Col md={4}>
+                                                    <FormField label="PASSPORT NO." value={formData.passportNumber} />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <FormField label="Email" value={formData.email} />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <FormField
+                                                        label="SLOT DATE"
+                                                        value={formData.slotDate}
+                                                    />
+                                                </Col>
+                                                {/* <Col md={4}>
+                                                                                <FormField label="VISA TYPE" value={formData.visaType} />
+                                                                            </Col> */}
+                                            </Row>
+                                        </>
+
+                                        :
+                                        <>
+                                            <Row className="g-4 mb-4">
+                                                <Col md={4}>
+                                                    <FormField label="TRACKING NO." value={formData.trackingId} />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <FormField label="FIRSTNAME" value={formData.firstName} />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <FormField label="SUR NAME" value={formData.surname} />
+                                                </Col>
+                                            </Row>
+
+                                            <Row className="g-4 mb-4">
+                                                <Col md={4}>
+                                                    <FormField label="PASSPORT NO." value={formData.passportNumber} />
+                                                </Col>
+                                                {/* <Col md={4}>
                     <FormField label="PASSPORT EXPIRY" value = {formData.passportExpiry} />
                 </Col> */}
-                                        <Col md={4}>
-                                            <FormField
-                                                label="APPOINTMENT DATE"
-                                                value={formData.collectionDate}
-                                            />
-                                        </Col>
-                                        <Col md={4}>
-                                            <FormField label="VISA TYPE" value={formData.visaType} />
-                                        </Col>
-                                    </Row>
+                                                <Col md={4}>
+                                                    <FormField
+                                                        label="APPOINTMENT DATE"
+                                                        value={formData.collectionDate}
+                                                    />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <FormField label="VISA TYPE" value={formData.visaType} />
+                                                </Col>
+                                            </Row>
+                                        </>
+                                    }
+                                    {/* Form Fields */}
+
 
                                     {showPickupForm && formData.status === "Ready for Pick-Up" && (
                                         <>
@@ -261,36 +292,42 @@ const DisabledFormPickup = ({ formData }) => {
 
                                                         <Form.Check
                                                             type="radio"
-                                                            id="have-document-no"
-                                                            name="hasCollectionOption"
+                                                            id="self"
+                                                            name="collectionOption"
                                                             label="In-Person"
-                                                            checked={collectionOption.hasCollectionOption}
-                                                            onChange={() =>
-                                                                setCollectionOption((prev) => ({
-                                                                    ...prev,
-                                                                    hasCollectionOption: true,
-                                                                    comments: "", // Clear comments when no document
-                                                                }))
-                                                            }
+                                                            checked={collectionOption.type === "self"}
+                                                            onChange={() => {
+                                                                setCollectionOption((prev) => {
+                                                                    console.log("Changing to self collection");
+                                                                    return {
+                                                                        ...prev,
+                                                                        type: "self",
+                                                                        comments: "",
+                                                                    };
+                                                                });
+                                                            }}
                                                         />
                                                         <Form.Check
                                                             type="radio"
-                                                            id="have-document-yes"
-                                                            name="hasCollectionOption"
+                                                            id="proxy"
+                                                            name="collectionOption"
                                                             label="Proxy Pick-up"
-                                                            checked={!collectionOption.hasCollectionOption}
-                                                            onChange={() =>
-                                                                setCollectionOption((prev) => ({
-                                                                    ...prev,
-                                                                    hasCollectionOption: false,
-                                                                }))
-                                                            }
+                                                            checked={collectionOption.type === "proxy"}
+                                                            onChange={() => {
+                                                                setCollectionOption((prev) => {
+                                                                    console.log("Changing to proxy collection");
+                                                                    return {
+                                                                        ...prev,
+                                                                        type: "proxy",
+                                                                    };
+                                                                });
+                                                            }}
                                                             className="mb-2"
                                                         />
                                                     </div>
                                                 </Col>
 
-                                                {!collectionOption.hasCollectionOption &&
+                                                {collectionOption.type === "proxy" &&
                                                     <Col md={4}>
                                                         <label
                                                             className="text-muted mb-2"
@@ -356,6 +393,8 @@ const DisabledFormPickup = ({ formData }) => {
                                             </div>
                                         </>
                                     )}
+
+
                                     {/* Attached Documents Section */}
                                     <div className="mt-5">
                                         <div
@@ -393,15 +432,15 @@ const DisabledFormPickup = ({ formData }) => {
                                                     onClick={() => handleTabClick('PRINT')}
 
                                                 >
-                                                    <Link
+                                                    {formData.collectionReceipt && <Link
                                                         href={formData.collectionReceipt}
                                                         target="_blank"
-                                                        style={ {textDecoration: "none"} }
+                                                        style={{ textDecoration: "none" }}
                                                         onClick={() => handleTabClick('PRINT')}
                                                         rel="noopener noreferrer"
                                                     >
                                                         PRINT
-                                                    </Link>
+                                                    </Link>}
                                                 </div>
                                                 <div
                                                     className="py-3 cursor-pointer"
@@ -417,23 +456,49 @@ const DisabledFormPickup = ({ formData }) => {
                                         {/* Event List */}
                                         <div className="p-4">
                                             <Table hover className="align-middle mb-0">
-                                                <tbody>
-                                                    {formData?.logs.map((log, index) => (
-                                                        <tr
-                                                            key={index}
-                                                            style={{
-                                                                boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                                                                backgroundColor: "white",
-                                                            }}
-                                                        >
-                                                            <td className="py-3">
-                                                                <span style={{ color: "#0d6efd" }}>{log.status}</span>
-                                                            </td>
-                                                            <td className="py-3 text-muted">{log.user}</td>
-                                                            <td className="py-3 text-muted">{log.date}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
+                                                {formData.status === "Appointment booked" ?
+
+                                                    <>
+                                                        <tbody>
+                                                            <tr
+                                                                style={{
+                                                                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                                                                    backgroundColor: "white",
+                                                                }}
+                                                            >
+                                                                <td className="py-3">
+                                                                    <span style={{ color: "#0d6efd" }}>{formData.status}</span>
+                                                                </td>
+                                                                {/* <td className="py-3 text-muted">
+                                                                        {formData.officer}
+                                                                    </td> */}
+                                                                <td className="py-3 text-muted">{formData.slotDate}, {formData.slotTime}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <tbody>
+                                                            {formData?.logs.map((log, index) => (
+                                                                <tr
+                                                                    key={index}
+                                                                    style={{
+                                                                        boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                                                                        backgroundColor: "white",
+                                                                    }}
+                                                                >
+                                                                    <td className="py-3">
+                                                                        <span style={{ color: "#0d6efd" }}>{log.status}</span>
+                                                                    </td>
+                                                                    <td className="py-3 text-muted">{log.user}</td>
+                                                                    <td className="py-3 text-muted">{log.date}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </>
+
+
+                                                }
                                             </Table>
 
                                             <div className="mt-5">

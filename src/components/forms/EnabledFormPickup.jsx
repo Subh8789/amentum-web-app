@@ -4,37 +4,42 @@ import { Container, Row, Col, Button, Nav, Table, Form } from "react-bootstrap";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import LoadingModal from "../modals/LoadingModal";
+import ErrorModal from "../modals/ErrorModal";
 
 import "../../utils/TrackingForm.css";
 import Link from "next/link";
 
 
-const LoadingModal = () => (
-    <div className="modal-overlay">
-        <div className="modal-content">
-            <div className="loading-spinner"></div>
-            <p>Processing your request...</p>
-        </div>
-    </div>
-);
+// const LoadingModal = () => (
+//     <div className="modal-overlay">
+//         <div className="modal-content">
+//             <div className="loading-spinner"></div>
+//             <p>Processing your request...</p>
+//         </div>
+//     </div>
+// );
 
-const ErrorModal = ({ message, onClose }) => (
-    <div className="modal-overlay">
-        <div className="modal-content">
-            <h3 className="error-title">Error</h3>
-            <p className="error-message">{message}</p>
-            <button className="modal-button" onClick={onClose}>
-                Close
-            </button>
-        </div>
-    </div>
-);
+// const ErrorModal = ({ message, onClose }) => (
+//     <div className="modal-overlay">
+//         <div className="modal-content">
+//             <h3 className="error-title">Error</h3>
+//             <p className="error-message">{message}</p>
+//             <button className="modal-button" onClick={onClose}>
+//                 Close
+//             </button>
+//         </div>
+//     </div>
+// );
 
 const EnabledFormPickup = ({ formData }) => {
+
+    console.log("EnabledFormPickup");
+
     const [selectedTab, setSelectedTab] = useState('EVENT/TRACKING');
 
     const [collectionOption, setCollectionOption] = useState({
-        hasCollectionOption: false,
+        type: "self", // default value
         comments: "",
     });
     const [showPickupForm, setShowPickupForm] = useState(false);
@@ -42,6 +47,12 @@ const EnabledFormPickup = ({ formData }) => {
     const [representativeName, setRepresentativeName] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    // Add console log to track collectionOption changes
+    useEffect(() => {
+        console.log("Collection Type Changed:", collectionOption.type);
+    }, [collectionOption.type]);
+
 
     const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
     const POST_KEY = process.env.NEXT_PUBLIC_POST_KEY
@@ -100,15 +111,17 @@ const EnabledFormPickup = ({ formData }) => {
                 },
                 body: JSON.stringify({
                     application: formData.id,
-                    status: "Dropped-Off At OIS",
+                    status: formData.status,
+                    // visaType: ""   //Optional
                     user: "Mr. Archie",
-                    additionalComments: !collectionOption.hasCollectionOption ? additionalComments : "",
-                    representativeName: !collectionOption.hasCollectionOption ? representativeName : "",
+                    collectedBy: collectionOption.type, // This will be either "self" or "proxy"
+                    additionalComments: collectionOption.type === "proxy" ? additionalComments : "",
+                    representativeName: collectionOption.type === "proxy" ? representativeName : "",
                 })
             });
 
             if (!response.ok) {
-                throw new Error(response.status === 400 ? "Bad Request" : "No Results Found");
+                throw new Error(response.status === 400 ? response.data : "No Results Found");
             }
 
             await response.json();
@@ -126,6 +139,9 @@ const EnabledFormPickup = ({ formData }) => {
 
     const searchParams = useSearchParams();
     const trackingCode = searchParams.get("trackingCode");
+
+
+    console.log("collectionOption", collectionOption);
 
 
     const FormField = ({ label, value, children }) => (
@@ -261,30 +277,36 @@ const EnabledFormPickup = ({ formData }) => {
 
                                                         <Form.Check
                                                             type="radio"
-                                                            id="have-document-no"
-                                                            name="hasCollectionOption"
+                                                            id="self"
+                                                            name="collectionOption"
                                                             label="In-Person"
-                                                            checked={collectionOption.hasCollectionOption}
-                                                            onChange={() =>
-                                                                setCollectionOption((prev) => ({
-                                                                    ...prev,
-                                                                    hasCollectionOption: true,
-                                                                    comments: "", // Clear comments when no document
-                                                                }))
-                                                            }
+                                                            checked={collectionOption.type === "self"}
+                                                            onChange={() => {
+                                                                setCollectionOption((prev) => {
+                                                                    console.log("Changing to self collection");
+                                                                    return {
+                                                                        ...prev,
+                                                                        type: "self",
+                                                                        comments: "",
+                                                                    };
+                                                                });
+                                                            }}
                                                         />
                                                         <Form.Check
                                                             type="radio"
-                                                            id="have-document-yes"
-                                                            name="hasCollectionOption"
+                                                            id="proxy"
+                                                            name="collectionOption"
                                                             label="Proxy Pick-up"
-                                                            checked={!collectionOption.hasCollectionOption}
-                                                            onChange={() =>
-                                                                setCollectionOption((prev) => ({
-                                                                    ...prev,
-                                                                    hasCollectionOption: false,
-                                                                }))
-                                                            }
+                                                            checked={collectionOption.type === "proxy"}
+                                                            onChange={() => {
+                                                                setCollectionOption((prev) => {
+                                                                    console.log("Changing to proxy collection");
+                                                                    return {
+                                                                        ...prev,
+                                                                        type: "proxy",
+                                                                    };
+                                                                });
+                                                            }}
                                                             className="mb-2"
                                                         />
                                                     </div>

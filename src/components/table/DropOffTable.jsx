@@ -242,10 +242,10 @@ const DropOffTable = ({ dropoffData, loading, error }) => {
               <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/dropoff/dropoff-report")}>
                 DROPOFF/ COLLECTION REPORT
               </Dropdown.Item>
-              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/dropoffofficerReport-ois")}>
+              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/dropoff/officerReport-ois")}>
                 OFFICER REPORT OIS
               </Dropdown.Item>
-              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/officerReport-Dhl")}>
+              <Dropdown.Item className="fw-semibold text-primary" onClick={() => router.push("/dropoff/officerReport-Dhl")}>
                 OFFICER REPORT DHL
               </Dropdown.Item>
             </Dropdown.Menu>

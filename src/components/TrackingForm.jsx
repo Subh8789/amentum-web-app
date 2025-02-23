@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Container, Row, Col, Button, Table, Form } from "react-bootstrap";
 import { ArrowLeft} from "lucide-react";
 import { useRouter } from "next/navigation";
+import ErrorModal from "./modals/ErrorModal";
+import LoadingModal from "./modals/LoadingModal";
 
 import "../utils/TrackingForm.css"
 
@@ -61,26 +63,6 @@ const visaDocuments = {
     ]
 };
 
-const LoadingModal = () => (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="loading-spinner"></div>
-        <p>Processing your request...</p>
-      </div>
-    </div>
-  );
-  
-  const ErrorModal = ({ message, onClose }) => (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h3 className="error-title">Error</h3>
-        <p className="error-message">{message}</p>
-        <button className="modal-button" onClick={onClose}>
-          Close
-        </button>
-      </div>
-    </div>
-  );
 
 
 const TrackingForm = ({ formData}) => {

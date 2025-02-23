@@ -11,6 +11,7 @@ import { Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import "./filter.css";
+import useReportDownloader from "@/customHooks/useReportDownloader";
 
 const OfficerReportPickup = ({ pickupData = [], loading, error }) => {
     console.log("pickupData", pickupData);
@@ -63,44 +64,26 @@ const OfficerReportPickup = ({ pickupData = [], loading, error }) => {
     };
 
 
-    //handle report download
+    const type ="pick";
+    const service="";
+    const user = "";
+
+    const { downloadReport, isLoading } = useReportDownloader(startDate, endDate, type, service, user );
+  
+    
     const handleDownloadReport = async () => {
-        if (!startDate || !endDate) {
-            alert("Please select a start and end date.");
-            return;
-        }
-
-        try {
-            const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
-            const POST_KEY = process.env.NEXT_PUBLIC_POST_KEY
-
-            const apiUrl = `${BASE_URL}/api/v1/waybill/track/report?type=pick&startDate=${startDate}&endDate=${endDate}&user=${selectedUser}`;
-
-            //console.log("apiUrl",apiUrl)
-            const response = await fetch(apiUrl, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    "post-key": POST_KEY,
-                },
-            });
-
-            if (!response.ok) throw new Error("Failed to download report");
-
-            const blob = await response.blob();
-
-            // Automatically trigger file download
-            const url = URL.createObjectURL(blob);
-            window.location.href = url;
-            URL.revokeObjectURL(url); // Clean up the object URL
-
-            alert("Report downloaded successfully.");
-            resetFilters(); // Reset filters after successful download
-        } catch (error) {
-            console.error("Error downloading report:", error);
-            alert("Failed to download the report. Please try again.");
-        }
-    };
+      const success = await downloadReport({
+        startDate,
+        endDate,
+        type,
+        service,
+        user
+      });
+      if (success) {
+        resetFilters(); // Your reset function
+      }
+    
+    }
 
 
     const currentRecords = useMemo(() => {
@@ -219,7 +202,7 @@ const OfficerReportPickup = ({ pickupData = [], loading, error }) => {
                     <thead>
                         <tr className="bg-light">
                             <th className="border-0 py-3">Passport Number</th>
-                            <th className="border-0 py-3">Source Manifest</th>
+                            {/* <th className="border-0 py-3">Source Manifest</th> */}
                             <th className="border-0 py-3">Center</th>
                             <th className="border-0 py-3">Surname</th>
                             <th className="border-0 py-3">Given Name</th>
@@ -236,7 +219,7 @@ const OfficerReportPickup = ({ pickupData = [], loading, error }) => {
                             currentRecords.map((row, index) => (
                                 <tr key={index} style={{ backgroundColor: index === 2 ? "#f0f9ff" : "white" }}>
                                     <td className="text-primary">{row.passportNumber}</td>
-                                    <td>{row.sourceManifest}</td>
+                                    {/* <td>{row.sourceManifest}</td> */}
                                     <td>{row.center}</td>
                                     <td>{row.surname}</td>
                                     <td>{row.firstName}</td>
@@ -245,6 +228,7 @@ const OfficerReportPickup = ({ pickupData = [], loading, error }) => {
                                     <td>{row.oisIntake}</td>
                                     <td>{row.officer}</td>
                                     {row.isDhl && <td>DHL</td>}
+                                    <td>{row.status}</td>
                                 </tr>
                             ))
                         ) : (
