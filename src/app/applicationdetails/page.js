@@ -1,11 +1,11 @@
 "use client";
-import DisabledForm from '@/components/DisabledForm';
-import TrackingForm from '@/components/TrackingForm';
+import DisabledForm from '@/components/forms/DisabledForm';
+import TrackingForm from '@/components/forms/TrackingForm';
 import React from 'react';
 import "./applicationDetails.css"
 import { useRouter } from 'next/navigation';
 import DisabledFormPickup from '@/components/forms/DisabledFormPickup';
-import EnabledFormPickup from '@/components/forms/EnabledFormPickup';
+// import EnabledFormPickup from '@/components/forms/EnabledFormPickup';
 import LoadingModal from '@/components/modals/LoadingModal';
 import ErrorModal from '@/components/modals/ErrorModal';
 

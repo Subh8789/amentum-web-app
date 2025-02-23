@@ -3,10 +3,10 @@ import React, { useState } from "react";
 import { Container, Row, Col, Button, Table, Form } from "react-bootstrap";
 import { ArrowLeft} from "lucide-react";
 import { useRouter } from "next/navigation";
-import ErrorModal from "./modals/ErrorModal";
-import LoadingModal from "./modals/LoadingModal";
+import ErrorModal from "../modals/ErrorModal";
+import LoadingModal from "../modals/LoadingModal";
 
-import "../utils/TrackingForm.css"
+import "../../utils/TrackingForm.css";
 
 const visaDocuments = {
     "(B1/B2) and C1D visa": [

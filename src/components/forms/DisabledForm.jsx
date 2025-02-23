@@ -6,13 +6,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 
-
-
-
 const DisabledForm = ({ formData, loading, error }) => {
     const [activeTab, setActiveTab] = useState("EVENT/TRACKING");
-
-
 
     const handleCheckboxChange = (event) => {
         const { value, checked } = event.target;
